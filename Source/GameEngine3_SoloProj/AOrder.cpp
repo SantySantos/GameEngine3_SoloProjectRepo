@@ -31,10 +31,7 @@ AAOrder::AAOrder()
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 }
 
-void AAOrder::Move(const FInputActionValue& InputActionValue)
-{
-	//add forward movement here
-}
+
 
 // Called when the game starts or when spawned
 void AAOrder::BeginPlay()
@@ -50,14 +47,20 @@ void AAOrder::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AAOrder::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AAOrder::MoveForward(float Value)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UEnhancedInputComponent *EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-
-	EIC->BindAction(XAxis, ETriggerEvent::Triggered,this, &AAOrder::Move);
-	
+	if (Value != 0)
+	{
+		AddMovementInput(GetActorForwardVector(), Value);
+	}
 }
+
+void AAOrder::MoveRight(float Value)
+{
+	if (Value != 0)
+	{
+		AddMovementInput(GetActorRightVector(), Value);
+	}
+}
+
 

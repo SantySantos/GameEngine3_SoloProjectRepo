@@ -33,22 +33,13 @@ class GAMEENGINE3_SOLOPROJ_API AAOrder : public APawn
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UFloatingPawnMovement> MovementComponent;
 
-	//settings actions
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> XAxis;
 	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> YAxis;
 
 public:
 	// Sets default values for this pawn's properties
 	AAOrder();
 
-	UFUNCTION()
-	void Move(const FInputActionValue& InputActionValue);
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,5 +47,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable)
+	void MoveForward(float Value);
+
+	UFUNCTION(BlueprintCallable)
+	void MoveRight(float Value);
 	
 };
+
