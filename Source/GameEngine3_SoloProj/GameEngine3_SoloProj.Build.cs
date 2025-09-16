@@ -8,7 +8,13 @@ public class GameEngine3_SoloProj : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"EnhancedInput",
+			"AIModule",
+			"StateTreeModule"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
