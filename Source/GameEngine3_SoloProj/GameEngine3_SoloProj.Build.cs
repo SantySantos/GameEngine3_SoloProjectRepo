@@ -14,7 +14,12 @@ public class GameEngine3_SoloProj : ModuleRules
 			"InputCore", 
 			"EnhancedInput",
 			"AIModule",
-			"StateTreeModule"});
+			"StateTreeModule",
+			"GameplayStateTreeModule",
+			"UMG",
+			"Slate",
+			"SlateCore"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
