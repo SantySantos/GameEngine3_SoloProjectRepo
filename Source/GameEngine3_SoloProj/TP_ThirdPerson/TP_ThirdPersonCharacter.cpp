@@ -49,6 +49,10 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	//Dash info
+	DashForce = 1000.0f;
+	CanDash = false;
 }
 
 void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -66,6 +70,10 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATP_ThirdPersonCharacter::Look);
+
+		// Dashing
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ATP_ThirdPersonCharacter::DoDash);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ATP_ThirdPersonCharacter::ResetDash);
 	}
 	else
 	{
@@ -131,4 +139,20 @@ void ATP_ThirdPersonCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void ATP_ThirdPersonCharacter::DoDash()
+{
+	if (CanDash)
+	{
+		FVector Forward = GetActorForwardVector();
+		FVector LaunchVelocity = Forward * DashForce;
+		LaunchCharacter(LaunchVelocity, true, true);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Dash"));
+	}
+}
+
+void ATP_ThirdPersonCharacter::ResetDash()
+{
+	CanDash = true;
 }

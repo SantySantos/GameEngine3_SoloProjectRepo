@@ -49,8 +49,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
-public:
+	/** Dash Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* DashAction;
 
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite, Category = "Dashing")
+	float DashForce;
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category = "Dashing")
+	bool CanDash;
+
+	
+public:
+	
 	/** Constructor */
 	ATP_ThirdPersonCharacter();	
 
@@ -81,9 +91,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpStart();
 
+
+	//example of doxigen style comment / documentation formatting
+	/**
+	 * @brief 
+	 * @param a = input integer for force 
+	* @return 
+	*/
+	int MyFnc(int a);
+	
 	/** Handles jump pressed inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+
+	/** Handles dash inputs from either controls or UI interfaces
+	 * @note Dashing is a simple forward impulse in the direction the character is facing
+	 */
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoDash();
+
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void ResetDash();
 
 public:
 
