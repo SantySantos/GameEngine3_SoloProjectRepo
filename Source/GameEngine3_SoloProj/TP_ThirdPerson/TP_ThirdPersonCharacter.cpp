@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 //#include "GameEngine3_SoloProj.h"
 #include "TP_ThirdPerson.h"
+#include "TimerManager.h"
 
 ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
@@ -52,7 +53,10 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 
 	//Dash info
 	DashForce = 1000.0f;
-	CanDash = false;
+	CanDash = true;
+	DashLength = 0.2f;
+	DashDelayLength = 2.0f;
+	OriginalVelocity = GetCharacterMovement()->Velocity;
 }
 
 void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -73,7 +77,7 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 		// Dashing
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ATP_ThirdPersonCharacter::DoDash);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ATP_ThirdPersonCharacter::ResetDash);
+		//EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ATP_ThirdPersonCharacter::ResetDash);
 	}
 	else
 	{
@@ -145,14 +149,46 @@ void ATP_ThirdPersonCharacter::DoDash()
 {
 	if (CanDash)
 	{
-		FVector Forward = GetActorForwardVector();
-		FVector LaunchVelocity = Forward * DashForce;
-		LaunchCharacter(LaunchVelocity, true, true);
+		//Debug
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Dash"));
+		
+		CanDash = false;
+		FVector Forward = GetActorForwardVector();
+		FVector DashVelocity = Forward * DashForce;
+		
+		LaunchCharacter(DashVelocity, true, true);
+		
+		//setting the length of the dash with a timer before reducing the speed again
+		GetWorldTimerManager().SetTimer
+		(
+			 TimerHandle_DashLength,
+			 this,
+			 &ATP_ThirdPersonCharacter::ResetDash,
+			 DashLength,
+			 false
+		);
+		
 	}
 }
 
 void ATP_ThirdPersonCharacter::ResetDash()
 {
+	//setting a timer before we can dash again
+	GetWorldTimerManager().SetTimer
+		(
+			 TimerHandle_ResetDash,
+			 this,
+			 &ATP_ThirdPersonCharacter::EnableDash,
+			 DashDelayLength,
+			 false
+		);    
+}
+
+void ATP_ThirdPersonCharacter::EnableDash()
+{
+	//re-enabling the dash ability
 	CanDash = true;
+	
+	//Debug
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("CanDash"));
 }

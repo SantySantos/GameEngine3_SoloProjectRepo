@@ -57,7 +57,22 @@ protected:
 	float DashForce;
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category = "Dashing")
 	bool CanDash;
+	
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category = "Dashing")
+	float DashLength;
 
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category = "Dashing")
+	float DashDelayLength;
+
+	
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category = "Dashing")
+	FVector OriginalVelocity;
+	
+	UPROPERTY(EditAnywhere, Category = "Dashing")
+	FTimerHandle TimerHandle_DashLength;
+
+	UPROPERTY(EditAnywhere, Category = "Dashing")
+	FTimerHandle TimerHandle_ResetDash;
 	
 public:
 	
@@ -112,7 +127,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void ResetDash();
-
+	
+	UFUNCTION(BlueprintCallable, Category="Dashing")
+	virtual void EnableDash();
+	
 public:
 
 	/** Returns CameraBoom subobject **/
