@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 //#include "GameEngine3_SoloProj.h"
+//#include "NiagaraComponent.h"
+//#include "NiagaraSystem.h"
 #include "TP_ThirdPerson.h"
 #include "TimerManager.h"
 
@@ -57,6 +59,9 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	DashLength = 0.2f;
 	DashDelayLength = 2.0f;
 	OriginalVelocity = GetCharacterMovement()->Velocity;
+	//DashEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DashEffect"));
+	//DashEffect->SetupAttachment(RootComponent);
+	
 }
 
 void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

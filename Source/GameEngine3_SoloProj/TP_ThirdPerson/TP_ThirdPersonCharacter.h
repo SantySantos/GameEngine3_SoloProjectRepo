@@ -73,6 +73,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Dashing")
 	FTimerHandle TimerHandle_ResetDash;
+
+	//UPROPERTY(VisibleAnywhere, Category = "Dashing")
+	//UNiagaraComponent* DashEffect;
 	
 public:
 	
