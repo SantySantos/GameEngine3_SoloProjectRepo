@@ -66,7 +66,7 @@ protected:
 
 	
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category = "Dashing")
-	FVector OriginalVelocity;
+	float OriginalFallingLateralFriction;
 	
 	UPROPERTY(EditAnywhere, Category = "Dashing")
 	FTimerHandle TimerHandle_DashLength;
@@ -76,6 +76,8 @@ protected:
 
 	//UPROPERTY(VisibleAnywhere, Category = "Dashing")
 	//UNiagaraComponent* DashEffect;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Movement")
+	bool bInTurret;
 	
 public:
 	

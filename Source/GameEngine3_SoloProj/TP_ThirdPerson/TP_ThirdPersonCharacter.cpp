@@ -20,7 +20,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -58,24 +58,27 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	CanDash = true;
 	DashLength = 0.2f;
 	DashDelayLength = 2.0f;
-	OriginalVelocity = GetCharacterMovement()->Velocity;
+	OriginalFallingLateralFriction = GetCharacterMovement()->FallingLateralFriction;
 	//DashEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DashEffect"));
 	//DashEffect->SetupAttachment(RootComponent);
-	
+
+
+	bInTurret = false;
 }
 
 void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATP_ThirdPersonCharacter::Move);
-		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ATP_ThirdPersonCharacter::Look);
+		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this,
+		                                   &ATP_ThirdPersonCharacter::Look);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATP_ThirdPersonCharacter::Look);
@@ -86,7 +89,10 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	}
 	else
 	{
-		UE_LOG(LogTP_ThirdPerson, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		UE_LOG(LogTP_ThirdPerson, Error,
+		       TEXT(
+			       "'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
+		       ), *GetNameSafe(this));
 	}
 }
 
@@ -110,26 +116,30 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 
 void ATP_ThirdPersonCharacter::DoMove(float Right, float Forward)
 {
-	if (GetController() != nullptr)
+	if (!bInTurret)
 	{
-		// find out which way is forward
-		const FRotator Rotation = GetController()->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		if (GetController() != nullptr)
+		{
+			// find out which way is forward
+			const FRotator Rotation = GetController()->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			// get forward vector
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+			// get right vector 
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, Forward);
-		AddMovementInput(RightDirection, Right);
+			// add movement 
+			AddMovementInput(ForwardDirection, Forward);
+			AddMovementInput(RightDirection, Right);
+		}
 	}
 }
 
 void ATP_ThirdPersonCharacter::DoLook(float Yaw, float Pitch)
 {
+	
 	if (GetController() != nullptr)
 	{
 		// add yaw and pitch input to controller
@@ -156,22 +166,26 @@ void ATP_ThirdPersonCharacter::DoDash()
 	{
 		//Debug
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Dash"));
-		
+
 		CanDash = false;
 		FVector Forward = GetActorForwardVector();
+		GetCharacterMovement()->FallingLateralFriction = GetCharacterMovement()->GroundFriction;
 		FVector DashVelocity = Forward * DashForce;
 		
-		LaunchCharacter(DashVelocity, true, true);
-		
+
+		LaunchCharacter(DashVelocity, false, false);
+
 		//setting the length of the dash with a timer before reducing the speed again
 		GetWorldTimerManager().SetTimer
 		(
-			 TimerHandle_DashLength,
-			 this,
-			 &ATP_ThirdPersonCharacter::ResetDash,
-			 DashLength,
-			 false
+			TimerHandle_DashLength,
+			this,
+			&ATP_ThirdPersonCharacter::ResetDash,
+			DashLength,
+			false
 		);
+		
+		
 		
 	}
 }
@@ -180,20 +194,22 @@ void ATP_ThirdPersonCharacter::ResetDash()
 {
 	//setting a timer before we can dash again
 	GetWorldTimerManager().SetTimer
-		(
-			 TimerHandle_ResetDash,
-			 this,
-			 &ATP_ThirdPersonCharacter::EnableDash,
-			 DashDelayLength,
-			 false
-		);    
+	(
+		TimerHandle_ResetDash,
+		this,
+		&ATP_ThirdPersonCharacter::EnableDash,
+		DashDelayLength,
+		false
+	);
+	
+	GetCharacterMovement()->FallingLateralFriction = OriginalFallingLateralFriction;
 }
 
 void ATP_ThirdPersonCharacter::EnableDash()
 {
 	//re-enabling the dash ability
 	CanDash = true;
-	
+
 	//Debug
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("CanDash"));
 }
