@@ -76,13 +76,15 @@ protected:
 
 	//UPROPERTY(VisibleAnywhere, Category = "Dashing")
 	//UNiagaraComponent* DashEffect;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Movement")
-	bool bInTurret;
+	
 	
 public:
 	
 	/** Constructor */
-	ATP_ThirdPersonCharacter();	
+	ATP_ThirdPersonCharacter();
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Movement")
+	bool bInTurret;
 
 protected:
 
