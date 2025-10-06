@@ -48,7 +48,7 @@ class GAMEENGINE3_SOLOPROJ_API ATurret : public AActor
 
 	/** Temp PlayerController that will be using the turret */
 	UPROPERTY(EditAnywhere, Category="Player")
-	ATP_ThirdPersonPlayerController *OwningPlayerController;
+	APlayerController *OwningPlayerController;
 
 	/** Max Turret Rotation on Y */
 	UPROPERTY(EditAnywhere, Category = "Turret")
@@ -56,6 +56,7 @@ class GAMEENGINE3_SOLOPROJ_API ATurret : public AActor
 	
 	UPROPERTY(EditAnywhere, Category = "Turret")
 	float maxAnglePitch;
+	
 public:	
 	// Sets default values for this actor's properties
 	ATurret();
@@ -71,6 +72,14 @@ protected:
 	/** Join/Leave Turret */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction *JoinLeaveTurretAction;
+
+	/**Spring Arm to hold the camera when using the turret*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,  Category = "Components")
+	USpringArmComponent *SpringArm;
+
+	/** Camera to use when player is using the turret */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UCameraComponent *TurretCamera;
 	
 public:	
 	// Called every frame

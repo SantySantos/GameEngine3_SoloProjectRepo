@@ -45,9 +45,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* LookAction;
 
-	/** Mouse Look Input Action */
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* MouseLookAction;
+
 
 	/** Dash Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -82,7 +80,14 @@ public:
 	
 	/** Constructor */
 	ATP_ThirdPersonCharacter();
+	
+	/** Mouse Look Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* MouseLookAction;
 
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Movement")
 	bool bInTurret;
 
@@ -96,8 +101,6 @@ protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
-	/** Called for looking input */
-	void Look(const FInputActionValue& Value);
 
 public:
 
