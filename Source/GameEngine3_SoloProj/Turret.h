@@ -12,6 +12,7 @@ class USphereComponent;
 class USceneComponent;
 class UInputAction;
 class ATP_ThirdPersonPlayerController;
+class UInputMappingContext;
 
 UCLASS()
 class GAMEENGINE3_SOLOPROJ_API ATurret : public AActor
@@ -65,6 +66,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
+	/** Mapping context of turret controls */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputMappingContext *TurretMappingContext;
+	
 	/** Use Turret Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction *UseTurretAction;

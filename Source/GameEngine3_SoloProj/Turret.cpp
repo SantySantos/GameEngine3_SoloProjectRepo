@@ -4,11 +4,13 @@
 #include "Turret.h"
 
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "TP_ThirdPerson/TP_ThirdPersonPlayerController.h"
 
 // Sets default values
@@ -108,9 +110,17 @@ void ATurret::OnPlayerEnterTurret(UPrimitiveComponent* OverlappedComp, AActor* O
 		if (OwningPlayerController)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Player Controller Cast Worked");
+			
+	        EnableInput(OwningPlayerController);
 
-			//enable input for turret
-			EnableInput(OwningPlayerController);
+			UEnhancedInputLocalPlayerSubsystem *Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+				OwningPlayerController->GetLocalPlayer());
+
+			if (Subsystem)
+			{
+				Subsystem->AddMappingContext(TurretMappingContext, 1);
+				GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Subsystem Worked");
+			}
 
 			if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent))
 			{
@@ -118,6 +128,8 @@ void ATurret::OnPlayerEnterTurret(UPrimitiveComponent* OverlappedComp, AActor* O
 				Input->BindAction(JoinLeaveTurretAction, ETriggerEvent::Started, this, &ATurret::JoinLeaveTurret);
 				GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Input Binding Worked");
 			}
+
+		
 		}
 	}
 }
@@ -132,7 +144,7 @@ void ATurret::OnPlayerExitTurret(UPrimitiveComponent* OverlappedComp,
 	{
 		if (OwningPlayerController)
 		{
-			//enable input for turret
+			//disable input for turret
 			DisableInput(OwningPlayerController);
 		}
 	}
@@ -140,8 +152,19 @@ void ATurret::OnPlayerExitTurret(UPrimitiveComponent* OverlappedComp,
 
 void ATurret::UseTurret()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Use Turret");
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, TurretNuzzle->GetComponentLocation(), GetActorRotation());
+	try
+	{
+		if (OwningPlayer->bInTurret)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Use Turret");
+			GetWorld()->SpawnActor<AActor>(ProjectileClass, TurretNuzzle->GetComponentLocation(), GetActorRotation());
+		}
+	}
+	catch (...)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Use Turret Failed");
+	}
+
 }
 
 void ATurret::JoinLeaveTurret()

@@ -162,7 +162,7 @@ void ATP_ThirdPersonCharacter::DoJumpEnd()
 
 void ATP_ThirdPersonCharacter::DoDash()
 {
-	if (CanDash)
+	if (CanDash && !bInTurret)
 	{
 		//Debug
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Dash"));
