@@ -71,7 +71,23 @@ void ATurret::BeginPlay()
 
 	if (TurretCamera)
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Turret Camera Exists");
+
+	/*
+	if(UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent); 
+			IsValid(EnhancedInput))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Enhanced Input Exists");
+		EnhancedInput->BindAction(UseTurretAction, ETriggerEvent::Started, this, &ATurret::UseTurret);
+		EnhancedInput->BindAction(JoinLeaveTurretAction, ETriggerEvent::Started, this, &ATurret::JoinLeaveTurret);
+	
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Enhanced Input Does Not Exist");
+	}
+	*/
 }
+
 
 // Called every frame
 void ATurret::Tick(float DeltaTime)
@@ -85,10 +101,9 @@ void ATurret::Tick(float DeltaTime)
 			float OwningPlayerPitch = FMath::ClampAngle(OwningPlayer->GetControlRotation().Pitch, minAnglePitch,
 			                                            maxAnglePitch);
 
-			
+
 			SetActorRotation(FRotator(TurretMesh->GetComponentRotation().Pitch, OwningPlayer->GetControlRotation().Yaw,
 			                          TurretMesh->GetComponentRotation().Roll));
-			
 		}
 	}
 }
@@ -110,10 +125,12 @@ void ATurret::OnPlayerEnterTurret(UPrimitiveComponent* OverlappedComp, AActor* O
 		if (OwningPlayerController)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Player Controller Cast Worked");
-			
-	        EnableInput(OwningPlayerController);
 
-			UEnhancedInputLocalPlayerSubsystem *Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+			EnableInput(OwningPlayerController);
+
+
+				UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+				UEnhancedInputLocalPlayerSubsystem>(
 				OwningPlayerController->GetLocalPlayer());
 
 			if (Subsystem)
@@ -128,8 +145,6 @@ void ATurret::OnPlayerEnterTurret(UPrimitiveComponent* OverlappedComp, AActor* O
 				Input->BindAction(JoinLeaveTurretAction, ETriggerEvent::Started, this, &ATurret::JoinLeaveTurret);
 				GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Input Binding Worked");
 			}
-
-		
 		}
 	}
 }
@@ -152,20 +167,25 @@ void ATurret::OnPlayerExitTurret(UPrimitiveComponent* OverlappedComp,
 
 void ATurret::UseTurret()
 {
-	try
+	if (OwningPlayer->bInTurret)
 	{
-		if (OwningPlayer->bInTurret)
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Use Turret");
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (AActor *tempProjectile = GetWorld()->SpawnActor<AActor>(ProjectileClass, FVector::ZeroVector, GetActorRotation(), SpawnParams);
+			IsValid(tempProjectile))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Use Turret");
-			GetWorld()->SpawnActor<AActor>(ProjectileClass, TurretNuzzle->GetComponentLocation(), GetActorRotation());
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "yay");
 		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "noy");
+		}
+		
 	}
-	catch (...)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Use Turret Failed");
-	}
-
 }
+
 
 void ATurret::JoinLeaveTurret()
 {
